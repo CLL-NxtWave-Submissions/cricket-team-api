@@ -139,7 +139,7 @@ app.put("/players/:playerId", async (req, res) => {
 });
 
 /*
-    End-Point 5: /players/:playerId
+    End-Point 5: DELETE /players/:playerId
     ------------
     To delete data of specific player from
     cricket_team table.
