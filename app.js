@@ -94,7 +94,7 @@ app.post("/players", async (req, res) => {
     Database.
 */
 
-app.get("/players/:playerId", async (req, res) => {
+app.get("/players/:playerId/", async (req, res) => {
   const { playerId } = req.params;
 
   const getSpecificPlayerDetailsQuery = `
@@ -136,6 +136,25 @@ app.put("/players/:playerId", async (req, res) => {
 
   await cricketTeamDBConnectionObj.run(updateSpecificPlayerDetailsQuery);
   res.send("Player Details Updated");
+});
+
+/*
+    End-Point 5: /players/:playerId
+    ------------
+    To delete data of specific player from
+    cricket_team table.
+*/
+
+app.delete("/players/:playerId", async (req, res) => {
+  const { playerId } = req.params;
+
+  const deleteSpecificPlayerQuery = `
+    DELETE FROM cricket_team
+    WHERE player_id = ${playerId};
+    `;
+
+  await cricketTeamDBConnectionObj.run(deleteSpecificPlayerQuery);
+  res.send("Player Removed");
 });
 
 module.exports = app;
