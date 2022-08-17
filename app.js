@@ -42,9 +42,13 @@ initializeDBAndServer();
 // carry out different data operations on data
 // in the backend sqlite DB.
 
-// End-Point 1: To fetch all player data from sqlite DB
-//              and send it as response to a GET request
-//              from client.
+/* 
+    End-Point 1: GET /players 
+    ------------
+    To fetch all player data from sqlite DB
+    and send it as response to a GET request
+    from client. 
+*/
 app.get("/players/", async (req, res) => {
   const getAllPlayersSQLQuery = `
     SELECT *
@@ -55,6 +59,83 @@ app.get("/players/", async (req, res) => {
     getAllPlayersSQLQuery
   );
   res.send(allPlayerData);
+});
+
+/* 
+    End-Point 2: POST /players 
+    ------------
+    To add new player data to the
+    cricket_team table in sqlite
+    database.
+*/
+
+app.post("/players", async (req, res) => {
+  const { playerName, jerseyNumber, role } = req.body;
+
+  const addNewPlayerDataQuery = `
+    INSERT INTO
+        cricket_team (player_name, jersey_number, role)
+    VALUES
+        ('${playerName}', ${jerseyNumber}, '${role}'); 
+    `;
+
+  const newPlayerDBInsertResponse = await cricketTeamDBConnectionObj.run(
+    addNewPlayerDataQuery
+  );
+
+  res.send("Player Added to Team");
+});
+
+/*
+    End-Point 3: GET /players/:playerId
+    ------------
+    To fetch details of specific player
+    from the cricket_team table in sqlite
+    Database.
+*/
+
+app.get("/players/:playerId", async (req, res) => {
+  const { playerId } = req.params;
+
+  const getSpecificPlayerDetailsQuery = `
+        SELECT * 
+        FROM cricket_team
+        WHERE
+        player_id = ${playerId};
+    `;
+
+  const specificPlayerDetails = await cricketTeamDBConnectionObj.get(
+    getSpecificPlayerDetailsQuery
+  );
+
+  res.send(specificPlayerDetails);
+});
+
+/*
+    End-Point 4: PUT /players/:playerId
+    ------------
+    To update details of specific player
+    in the cricket_team table within sqlite
+    database.
+*/
+
+app.put("/players/:playerId", async (req, res) => {
+  const { playerId } = req.params;
+  const { playerName, jerseyNumber, role } = req.body;
+
+  const updateSpecificPlayerDetailsQuery = `
+    UPDATE 
+        cricket_team
+    SET 
+        player_name = '${playerName}',
+        jersey_number = ${jerseyNumber},
+        role = '${role}'
+    WHERE
+        player_id = ${playerId};
+    `;
+
+  await cricketTeamDBConnectionObj.run(updateSpecificPlayerDetailsQuery);
+  res.send("Player Details Updated");
 });
 
 module.exports = app;
